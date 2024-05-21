@@ -2,6 +2,10 @@
 
 TuneGen is an innovative web application that recommends Spotify playlists based on the user's detected emotions using real-time facial recognition and emotion analysis.
 
+## TuneGen Video
+
+https://github.com/KaShiekzmi/TuneGen-Emotion-based-Spotify-playlist-recommendation-system.-/assets/114513868/10e01cf9-2d72-466e-9a69-c127ab62c52f
+
 ## Features
 
 - **Real-Time Emotion Detection**: Uses your webcam to capture facial expressions and detect emotions.
@@ -26,8 +30,8 @@ TuneGen is an innovative web application that recommends Spotify playlists based
 
 Ensure the paths for the model and Haarcascade XML file in app.py are correct based on your project structure:
 
-face_classifier = cv2.CascadeClassifier('path/to/haarcascade_frontalface_default.xml')
-classifier = load_model('path/to/model.h5')
+- face_classifier = cv2.CascadeClassifier('path/to/haarcascade_frontalface_default.xml')
+- classifier = load_model('path/to/model.h5')
 
 ## Add Your Spotify Playlists
 
@@ -43,5 +47,9 @@ Flask, OpenCV, Keras, TensorFlow, Numpy
 
 ### Models
 
-  1. Face Detection Model: Uses OpenCV's Haar Cascade Classifier to detect faces in the video frames.
-  2. Emotion Detection Model: A deep learning model built with Keras, pre-trained on a dataset of facial expressions to recognize emotions such as Angry, Fear, Happy, Neutral, Sad, and Surprise.
+  1. **Face Detection Model:** Uses OpenCV's Haar Cascade Classifier to detect faces in the video frames.
+  2. **Emotion Detection Model:** A deep learning model built with Keras, pre-trained on a dataset of facial expressions to recognize emotions such as Angry, Fear, Happy, Neutral, Sad, and Surprise.
+
+## Contribution
+
+Feel free to fork this repository and contribute by submitting a pull request. For major changes, please open an issue first to discuss what you would like to change.
