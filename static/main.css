@@ -1,0 +1,253 @@
+*{
+    margin: 0;
+    padding: 0;
+    color: white;
+    box-sizing: border-box;
+}
+html{
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+/* ------------------------------------------------- */
+/* Main.html Styling */
+#navbar{
+    display: flex;
+    align-items: center;
+    position: relative;
+    top: 0px;
+    background-color: #fdfdfd;
+    margin-bottom: 0px;
+}
+#navbar::before{
+ 
+    background-color: white; 
+
+}
+#logo{
+    margin: 22px 5px;
+    padding-left: 95px;
+}
+#logo img{
+    height: 60px;
+    margin: 3px 6px;
+}
+
+.p{
+    display: flex;
+}
+.p h1{
+    color :#425FEB;
+    list-style: none;
+    font-size: 38px;
+    font-family: 'Laila';
+    text-decoration: none;
+} 
+.p a{
+    text-decoration: none;
+}
+.detail{
+    margin-left: 4%;
+    margin-top: 11%;
+    margin-bottom: 206px;
+}
+.detail h1{
+    font-family: 'Sedgwick Ave';
+    margin-left: 62px;
+    font-size: 70px;
+    color: black;
+    font-weight: lighter;
+}
+.spanA{
+    color: #425FEB;
+    font-size: 90px;
+}
+.detail p{
+    margin-left: 62px;
+    font-family: 'laila';
+    font-size: 20px;
+    color: black;
+    line-height: 30px;
+    font-weight: lighter;
+}
+.image{
+    width: 30%;
+    height: 80%;
+    position: absolute;
+    bottom: 0;
+    right: 100px;
+}
+@keyframes dance {
+    0% {
+        transform: translateX(-5px);
+    }
+    50% {
+        transform: translateX(5px);
+    }
+    100% {
+        transform: translateX(-5px);
+    }
+}
+.image img{
+    height: 82%;
+    position: absolute;
+    right: 7%;
+    bottom: 135px; 
+    animation: dance 2s infinite normal; 
+}
+
+.btn{
+    margin: 35px 7px 15px 60px;
+    background-color: #425FEB;
+    /* color: white; */
+    font-family: 'Glory';
+    padding: 5.5px 20px;
+    border-radius: 20px;
+    font-size: 18px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+.btn a{
+    text-decoration: none;
+    color: white;
+}
+.btn:hover {
+    background-color: #1e3ac7;
+    box-shadow: 0 0 1px rgb(18, 65, 137);
+   
+}
+
+.features {
+    padding: 10px 20px 120px 20px;
+    background-color: #ffffff;
+    text-align: center;
+}
+
+.features h2 {
+    font-size: 40px;
+    color: #425FEB;
+    margin-bottom: 10px;
+    font-family: 'Laila', sans-serif;
+}
+
+.features-container {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;  
+}
+
+.feature {
+    flex: 1 1 250px;
+    max-width: 250px;
+    margin: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    text-align: center;  
+}
+
+.feature:hover {
+    transform: translateY(-10px);
+}
+
+.feature i {
+    font-size: 40px;
+    color: #425FEB;
+    margin-bottom: 20px;
+}
+
+.feature h3 {
+    font-size: 24px;
+    color: #000;
+    margin-bottom: 10px;
+    font-family: 'Glory', sans-serif;
+}
+
+.feature p {
+    font-size: 16px;
+    color: #666;
+    font-family: 'Laila', sans-serif;
+}
+
+#footer {
+    background-color: #fdfdfd;
+    color: #000;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.footer-container p {
+    margin-right: 30px;
+    font-size: 20px;
+}
+
+.social-media {
+    margin-bottom: 25px;
+}
+
+.social-media a {
+    color: #425FEB !important; 
+    font-size: 25px;
+    margin: 0px 10px;
+    text-decoration: none; 
+}
+
+.social-media a:hover {
+    color: #081c7e !important;
+}
+
+.footer-link {
+    color: black;   
+    font-family: 'laila';
+    font-weight: bold;
+    text-decoration: none; /* Remove underline */
+}
+
+/* ----------------------------------------------------------------------------------------------- */
+/* Music.html CSS styling*/
+
+.index_resultpage{
+    background-color: white;
+    margin: 0;
+    padding: 0;
+}
+
+.playlist {
+    margin-top: 15px;
+    text-align: center;
+}
+.playlist h1{
+    font-size: 33px;
+    font-family: 'laila';
+    color: #282828;
+}
+
+.box_div {
+    margin: 20px auto 0px auto; 
+    width: 800px; 
+    border-radius: 16px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    padding: 5px;
+    background-color: #090909;
+
+}
+
+.box_div iframe {
+    border: none;
+    width: 100%;
+    height: 680px; 
+}

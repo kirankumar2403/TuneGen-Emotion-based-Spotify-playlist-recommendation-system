@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href='https://fonts.googleapis.com/css?family=Laila' rel='stylesheet'>
+  <link href='https://fonts.googleapis.com/css?family=Glory' rel='stylesheet'>
+  <link rel="stylesheet" href="../static/main2.css">
+  <title>Emotion Detection</title>
+</head>
+<body class="index">
+  <nav id="navbar">
+    <div id="logo">
+      <a href="/"><img src="../static/Logo.png" alt="Logo"></a>
+    </div>
+    <div class="p">
+      <a href="/"><h1>TuneGen</h1></a>
+    </div>
+  </nav>
+  
+  <div id="videoContainer">
+    <div>
+      <img src="{{url_for('video')}}" id="video_stream" class="full-withradius border"/>
+    </div>
+  </div>
+    
+  <form action="/playlist" method="POST">
+    <button class="btn btn-outline-success" type="submit" value="Search">Open Playlist</button>
+  </form> 
+
+  <footer id="footer">
+    <div class="footer-container">
+      <section class="social-media">
+        <a href="#!" role="button" class="fab fa-facebook-f span1"></a>
+        <a href="#!" role="button" class="fab fa-twitter span2"></a>
+        <a href="#!" role="button" class="fab fa-google span3"></a>
+        <a href="#!" role="button" class="fab fa-instagram span4"></a>
+        <a href="#!" role="button" class="fab fa-linkedin span1"></a>
+        <a href="#!" role="button" class="fab fa-github span2"></a>
+      </section>
+    </div>
+    <div class="footer-container">
+      <p><a class="footer-link">©Copyright Reserved by MS & KAK</a></p>
+    </div>
+  </footer>
+  
+</body>
+</html>
