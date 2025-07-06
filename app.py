@@ -164,4 +164,4 @@ def get_playlist_url(emotion):
     return playlists.get(emotion)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
