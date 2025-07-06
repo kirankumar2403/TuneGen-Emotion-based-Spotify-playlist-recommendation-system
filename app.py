@@ -1,100 +1,167 @@
-from flask import Flask, render_template, request, Response, redirect, url_for
+from flask import Flask, render_template, Response, request, redirect, url_for, session
 import cv2
-from keras.models import load_model
-from keras.preprocessing.image import img_to_array
 import numpy as np
-import time
+from tensorflow.keras.models import load_model
+import os
 
+app = Flask(__name__)
+app.secret_key = 'tunegen_secret_key'
 
-app=Flask(__name__)
-camera=cv2.VideoCapture(0)
-face_classifier = cv2.CascadeClassifier('D:/COMSATS/5th Semester/Human Computer Interaction/Project\Music Recommender System/haarcascade_frontalface_default.xml')
-classifier =load_model('D:/COMSATS/5th Semester/Human Computer Interaction/Project\Music Recommender System/model.h5')
-emotion_labels = ['Angry','Fear','Happy','Neutral', 'Sad', 'Surprise']
+# Set paths for model and haarcascade
+base_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(base_dir, 'model.h5')
+haarcascade_path = os.path.join(base_dir, 'haarcascade_frontalface_default.xml')
 
-def generate_frames():
-    camera=cv2.VideoCapture(0) 
-    while True:
-        success,frame=camera.read()
-        if not success:
-            break
-        else:
-            capture_duration = 5
-            start_time = time.time()
-            while( int(time.time() - start_time) < capture_duration ):
-                _, frame = camera.read()
-                frame=cv2.flip(frame,1)
-                labels = []
-                gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-                faces = face_classifier.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(30, 30), flags=cv2.CASCADE_SCALE_IMAGE)
+# Create the model architecture (same as in emotions.py)
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D, Input
 
-                for (x,y,w,h) in faces:
-                    cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,255),2)
-                    roi_gray = gray[y:y+h,x:x+w]
-                    roi_gray = cv2.resize(roi_gray,(48,48),interpolation=cv2.INTER_AREA)
+# Create the model with the same architecture as in emotions.py
+classifier = Sequential()
+classifier.add(Input(shape=(48, 48, 1)))
+classifier.add(Conv2D(32, kernel_size=(3, 3), activation='relu'))
+classifier.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+classifier.add(MaxPooling2D(pool_size=(2, 2)))
+classifier.add(Dropout(0.25))
 
-                    if np.sum([roi_gray])!=0:
-                        roi = roi_gray.astype('float')/255.0
-                        roi = img_to_array(roi)
-                        roi = np.expand_dims(roi,axis=0)
-                        prediction = classifier.predict(roi)[0]
-                        global label
-                        label=emotion_labels[prediction.argmax()]
-                        label_position = (x,y)
-                        cv2.putText(frame,label,label_position,cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,0),2)
-                        print(label)
-                ret,buffer=cv2.imencode('.jpg',frame)
-                frame=buffer.tobytes()
-                cv2.waitKey(0)
-                yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n'+ frame + b'\r\n\r\n')
+classifier.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+classifier.add(MaxPooling2D(pool_size=(2, 2)))
+classifier.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+classifier.add(MaxPooling2D(pool_size=(2, 2)))
+classifier.add(Dropout(0.25))
+
+classifier.add(Flatten())
+classifier.add(Dense(1024, activation='relu'))
+classifier.add(Dropout(0.5))
+classifier.add(Dense(7, activation='softmax'))
+
+# Load the pre-trained weights
+classifier.load_weights(model_path)
+
+# Load face classifier
+face_classifier = cv2.CascadeClassifier(haarcascade_path)
+
+# Dictionary which assigns each label an emotion
+emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
+
+# Global variable to store detected emotion
+detected_emotion = None
+
 @app.route('/')
-def main():
+def index():
     return render_template('index.html')
 
 @app.route('/detection')
-def index():
+def detection():
     return render_template('detection.html')
+
+def gen_frames():
+    global detected_emotion
+    cap = cv2.VideoCapture(0)
+    
+    while True:
+        # Read frame from camera
+        ret, frame = cap.read()
+        if not ret:
+            break
+            
+        # Convert to grayscale
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        
+        # Detect faces
+        faces = face_classifier.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
+        
+        for (x, y, w, h) in faces:
+            # Draw rectangle around face
+            cv2.rectangle(frame, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
+            
+            # Extract face region
+            roi_gray = gray[y:y + h, x:x + w]
+            
+            # Resize and prepare for prediction
+            try:
+                roi_gray = cv2.resize(roi_gray, (48, 48))
+                roi = roi_gray.reshape(1, 48, 48, 1) / 255.0
+                
+                # Predict emotion
+                prediction = classifier.predict(roi)
+                maxindex = int(np.argmax(prediction))
+                
+                # Store detected emotion
+                detected_emotion = emotion_dict[maxindex]
+                
+                # Display emotion text
+                cv2.putText(frame, detected_emotion, (x+20, y-60), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            except:
+                continue
+        
+        # Encode frame to JPEG
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
+        
+        # Yield frame for streaming
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/video')
 def video():
-    return Response(generate_frames(),mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(gen_frames(), 
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@app.route('/playlist', methods=['POST'])
+def playlist():
+    global detected_emotion
+    
+    if detected_emotion is None:
+        return redirect(url_for('detection'))
+    
+    # Store emotion in session
+    session['emotion'] = detected_emotion
+    
+    # Get Spotify playlist URL based on emotion
+    playlist_url = get_playlist_url(detected_emotion)
+    
+    if playlist_url:
+        return render_template('music.html', src=playlist_url)
+    else:
+        return render_template('404.html')
 
-######### Code for displaying Videos or Music ##################
-@app.route('/playlist',methods = ["POST", "GET"])
+def get_playlist_url(emotion):
+    # Spotify playlist URLs for different emotions based on specific mood recommendations
+    # Telugu song playlists for different emotional states
+    
+    # Customized Telugu playlist recommendations based on emotional needs:
+    # - Sad: Uplifting Telugu songs to improve mood
+    # - Neutral: Peaceful Telugu songs for relaxation
+    # - Angry: Calm Telugu songs to reduce tension
+    # - Happy: Energetic or joyful Telugu songs to maintain positive mood
+    # - Surprised: Exciting or energetic Telugu songs to match the emotion
+    
+    playlists = {
+        # Calm Telugu songs for angry emotions
+        "Angry": "https://open.spotify.com/embed/playlist/37i9dQZF1DX5q67ZpWyRrZ?utm_source=generator",
+        
+        # Telugu songs for disgusted emotion
+        "Disgusted": "https://open.spotify.com/embed/playlist/37i9dQZF1DX5OepaGriAIm?utm_source=generator",
+        
+        # Telugu songs for fearful emotion
+        "Fearful": "https://open.spotify.com/embed/playlist/37i9dQZF1DX5OepaGriAIm?utm_source=generator",
+        
+        # Energetic/joyful Telugu songs for happy emotions
+        "Happy": "https://open.spotify.com/embed/playlist/37i9dQZF1DX1i3hvzHpcQV?utm_source=generator",
+        
+        # Peaceful Telugu songs for neutral emotions
+        "Neutral": "https://open.spotify.com/embed/playlist/37i9dQZF1DX6XE7HRLM75P?utm_source=generator",
+        
+        # Uplifting Telugu songs for sad emotions
+        "Sad": "https://open.spotify.com/embed/playlist/37i9dQZF1DX6XE7HRLM75P?utm_source=generator",
+        
+        # Exciting/energetic Telugu songs for surprised emotions
+        "Surprised": "https://open.spotify.com/embed/playlist/37i9dQZF1DX1i3hvzHpcQV?utm_source=generator"
+    }
+    
+    return playlists.get(emotion)
 
-def playlistmanager():
-
-        try:
-            label
-        except NameError:
-            return render_template('404.html')
-        else:
-            
-            input=[]
-            input=label
-            print(input)
-                    ###playlist selection###
-            if input=='Happy':
-                   return render_template('music.html',input="Happy", src="https://open.spotify.com/embed/playlist/0xKR9q0f6Lp9gUzpJtPJIr?utm_source=generator&theme=0")
-               
-            elif input=='Sad':
-                   return render_template('music.html',input="Sad", src="https://open.spotify.com/embed/playlist/6MMSkLCHEZQSMEdAKG6ewq?utm_source=generator" )
-                                                                                        
-            elif input=='Neutral':
-                   return render_template('music.html',input="Neutral", src="https://open.spotify.com/embed/playlist/2GFblcGwMfYLY9QNsC6jTp?utm_source=generator")
-               
-            elif input=='Angry':
-                   return render_template('music.html',input="Angry", src="https://open.spotify.com/embed/playlist/11Wrk6FFsSHorOFsCcj4J8?utm_source=generator")
-               
-            elif input=='Surprise':
-                   return render_template('music.html',input="Surprice", src="https://open.spotify.com/embed/playlist/5xWyRko1R0vU8H2YvdMdeu?utm_source=generator")
-               
-            elif input=='Fear':
-                   return render_template('music.html',input="Fear", src="https://open.spotify.com/embed/playlist/2tswsTtlpSXvg4dvxgdu6l?utm_source=generator")
-            else:
-                return Response("Enter valid keyword")
-
-            
 if __name__ == '__main__':
     app.run(debug=True)
