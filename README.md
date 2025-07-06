@@ -4,7 +4,7 @@ TuneGen is an innovative web application that recommends Spotify playlists based
 
 ## TuneGen Video
 
-https://github.com/KaShiekzmi/TuneGen-Emotion-based-Spotify-playlist-recommendation-system.-/assets/114513868/10e01cf9-2d72-466e-9a69-c127ab62c52f
+https://github.com/kirankumar2403/TuneGen-Emotion-based-Spotify-playlist-recommendation-system.-/assets/114513868/10e01cf9-2d72-466e-9a69-c127ab62c52f
 
 ## Features
 
